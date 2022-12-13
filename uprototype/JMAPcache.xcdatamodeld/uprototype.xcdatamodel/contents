@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDAccount" representedClassName="CDAccount" syncable="YES" codeGenerationType="class">
+        <attribute name="emailState" optional="YES" attributeType="String"/>
+        <attribute name="identityState" optional="YES" attributeType="String"/>
+        <attribute name="mailboxState" optional="YES" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="threadState" optional="YES" attributeType="String"/>
+        <attribute name="uid" attributeType="String"/>
+        <relationship name="credential" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCredential" inverseName="accounts" inverseEntity="CDCredential"/>
+        <relationship name="identities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDIdentity" inverseName="account" inverseEntity="CDIdentity"/>
+        <relationship name="mailboxes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDMailbox" inverseName="account" inverseEntity="CDMailbox"/>
+    </entity>
+    <entity name="CDCredential" representedClassName="CDCredential" syncable="YES" codeGenerationType="class">
+        <attribute name="sessionURL" attributeType="URI"/>
+        <attribute name="userName" optional="YES" attributeType="String"/>
+        <attribute name="uuid" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="accounts" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDAccount" inverseName="credential" inverseEntity="CDAccount"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="uuid"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="CDIdentity" representedClassName="CDIdentity" syncable="YES" codeGenerationType="class">
+        <attribute name="email" attributeType="String"/>
+        <attribute name="initialized" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
+        <attribute name="serverSetId" attributeType="String"/>
+        <relationship name="account" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDAccount" inverseName="identities" inverseEntity="CDAccount"/>
+        <relationship name="replyTo" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="identityReplyTo" inverseEntity="NamedEmailAddress"/>
+    </entity>
+    <entity name="CDMailbox" representedClassName="CDMailbox" syncable="YES" codeGenerationType="class">
+        <attribute name="id_" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="role" optional="YES" attributeType="String"/>
+        <relationship name="account" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDAccount" inverseName="mailboxes" inverseEntity="CDAccount"/>
+        <relationship name="messages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="mailboxes" inverseEntity="Email"/>
+    </entity>
+    <entity name="Email" representedClassName="Email" syncable="YES" codeGenerationType="class">
+        <attribute name="htmlBody" optional="YES" attributeType="String"/>
+        <attribute name="htmlBodyBlobId" attributeType="String"/>
+        <attribute name="jmapId" attributeType="String"/>
+        <attribute name="preview" optional="YES" attributeType="String"/>
+        <attribute name="receivedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sentAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="subject" optional="YES" attributeType="String"/>
+        <attribute name="textHeader" optional="YES" attributeType="String"/>
+        <attribute name="threadId" attributeType="String"/>
+        <relationship name="bcc" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="bccOf" inverseEntity="NamedEmailAddress"/>
+        <relationship name="cc" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="ccOf" inverseEntity="NamedEmailAddress"/>
+        <relationship name="from" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="fromOf" inverseEntity="NamedEmailAddress"/>
+        <relationship name="mailboxes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDMailbox" inverseName="messages" inverseEntity="CDMailbox"/>
+        <relationship name="recipients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="recipientOf" inverseEntity="NamedEmailAddress"/>
+        <relationship name="replyTo" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="replyToOf" inverseEntity="NamedEmailAddress"/>
+        <relationship name="sender" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="NamedEmailAddress" inverseName="senderOf" inverseEntity="NamedEmailAddress"/>
+        <relationship name="thread" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Thread" inverseName="emails" inverseEntity="Thread"/>
+    </entity>
+    <entity name="EmailAddress" representedClassName="EmailAddress" syncable="YES" codeGenerationType="class">
+        <attribute name="address" optional="YES" attributeType="String"/>
+        <relationship name="appearsIn" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NamedEmailAddress" inverseName="emailAddress" inverseEntity="NamedEmailAddress"/>
+    </entity>
+    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="NamedEmailAddress" representedClassName="NamedEmailAddress" syncable="YES" codeGenerationType="class">
+        <attribute name="name" attributeType="String"/>
+        <relationship name="bccOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="bcc" inverseEntity="Email"/>
+        <relationship name="ccOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="cc" inverseEntity="Email"/>
+        <relationship name="emailAddress" maxCount="1" deletionRule="Nullify" destinationEntity="EmailAddress" inverseName="appearsIn" inverseEntity="EmailAddress"/>
+        <relationship name="fromOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="from" inverseEntity="Email"/>
+        <relationship name="identityReplyTo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDIdentity" inverseName="replyTo" inverseEntity="CDIdentity"/>
+        <relationship name="recipientOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="recipients" inverseEntity="Email"/>
+        <relationship name="replyToOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="replyTo" inverseEntity="Email"/>
+        <relationship name="senderOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="sender" inverseEntity="Email"/>
+    </entity>
+    <entity name="Thread" representedClassName="Thread" syncable="YES" codeGenerationType="class">
+        <attribute name="id_" optional="YES" attributeType="String"/>
+        <relationship name="emails" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Email" inverseName="thread" inverseEntity="Email"/>
+    </entity>
+</model>
