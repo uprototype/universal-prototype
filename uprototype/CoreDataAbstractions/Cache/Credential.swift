@@ -56,7 +56,7 @@ extension SessionizedCredential {
         
         //handle change object ids
         try CDMailbox.remove(ids: changesResponse.destroyed, from: account)
-
+        
         
         let fetchList = Array( Set(changesResponse.created).union(changesResponse.updated) )
         if !fetchList.isEmpty {

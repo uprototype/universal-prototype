@@ -149,24 +149,36 @@ actor MailMessageModel {
         sessionObj.task = Task {
             try await updatedSession(sessionObj)
         }
+        let result = await sessionObj.task?.result
+        switch result {
+        case .failure(let error):
+            throw error
+        default:
+            return
+        }
         
     }
     
     private func updatedSession(_ sessCredential: SessionizedCredential) async throws {
-        debugState?.updateFetch(description: "fetching Mailboxes", progress: 0.3)
-        try await sessCredential.fetchMailboxes()
+        do{
+            debugState?.updateFetch(description: "fetching Mailboxes", progress: 0.3)
+            try await sessCredential.fetchMailboxes()
+            
+            debugState?.updateFetch(description: "fetching Identities", progress: 0.4)
+            try await sessCredential.fetchIdentities()
+            //            try await indexedSession.syncIdentities()
+            //
+            debugState?.updateFetch(description: "fetching Emails", progress: 0.6)
+            //            try await indexedSession.fetchSendThreads()
+            //Fetch Emails
+            //            try await fetchEmails(uuid: uuid, session: session)
+            //
+            debugState?.updateFetch(description: "fetch complete", progress: 1.0)
+        }catch{
+            debugState?.updateFetch(description: "Error in fetch sequence", progress: 0.0)
+            throw error
+        }
         
-        debugState?.updateFetch(description: "fetching Identities", progress: 0.4)
-        try await sessCredential.fetchIdentities()
-        //            try await indexedSession.syncIdentities()
-        //
-        debugState?.updateFetch(description: "fetching Emails", progress: 0.6)
-        //            try await indexedSession.fetchSendThreads()
-        //Fetch Emails
-        //            try await fetchEmails(uuid: uuid, session: session)
-        //
-        debugState?.updateFetch(description: "fetch complete", progress: 1.0)
-
     }
     
     // MARK: - Implementation - Emails
