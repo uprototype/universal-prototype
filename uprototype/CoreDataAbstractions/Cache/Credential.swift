@@ -156,7 +156,7 @@ class Credential {
             let storedCredential : CDCredential
             if let existingObjId = self.managedObjectId {
                 guard let credential = try context.existingObject(with: existingObjId) as? CDCredential else {
-                    throw MailModelError.expectedObjectMissing
+                    throw PersistenceError.expectedObjectMissing
                 }
                 storedCredential = credential
             }else{
@@ -231,7 +231,7 @@ class Credential {
     private convenience init(stored: CDCredential) throws {
         guard let storedSessionURL = stored.sessionURL,
               let storedUUID = stored.uuid else {
-            throw MailModelError.requiredFieldMissing
+            throw PersistenceError.requiredAttributeMissing
         }
         
         guard let passwordString = KeychainInterface.readPasswordMaybe(service: storedSessionURL.absoluteString, account: storedUUID.uuidString) else {
@@ -247,7 +247,7 @@ class Credential {
         
         try stored.accounts?.forEach { storedAccount in
             guard let storedAccount = storedAccount as? CDAccount else{
-                throw MailModelError.expectedObjectMissing
+                throw PersistenceError.expectedObjectMissing
             }
             let account = try Account(stored: storedAccount)
             accounts.insert(account)
@@ -280,10 +280,10 @@ extension CDCredential {
             if results.count == 1 {
                 return results[0]
             }else{
-                throw MailModelError.duplicateUniqueObject
+                throw PersistenceError.duplicateUniqueObject
             }
         } catch {
-            throw MailModelError.abstractObjectWithoutStoredCopy
+            throw PersistenceError.abstractObjectWithoutStoredCopy
         }
     }
 

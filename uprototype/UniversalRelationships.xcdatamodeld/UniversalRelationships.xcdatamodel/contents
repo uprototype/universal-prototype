@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="AlternateRemoteNames" representedClassName="AlternateRemoteNames" syncable="YES" codeGenerationType="class">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDAlternateRemoteNames" representedClassName="CDAlternateRemoteNames" syncable="YES" codeGenerationType="class">
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="address" maxCount="1" deletionRule="Nullify" destinationEntity="RemoteEmailIdentity" inverseName="alternateNames" inverseEntity="RemoteEmailIdentity"/>
+        <relationship name="address" maxCount="1" deletionRule="Nullify" destinationEntity="CDRemoteEmailIdentity" inverseName="alternateNames" inverseEntity="CDRemoteEmailIdentity"/>
     </entity>
-    <entity name="LocalEmailIdentity" representedClassName="LocalEmailIdentity" syncable="YES" codeGenerationType="class">
+    <entity name="CDLocalEmailIdentity" representedClassName="CDLocalEmailIdentity" syncable="YES" codeGenerationType="class">
         <attribute name="address" attributeType="String"/>
-        <relationship name="names" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LocalNamedEmail" inverseName="address" inverseEntity="LocalNamedEmail"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="names" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDLocalNamedEmail" inverseName="address" inverseEntity="CDLocalNamedEmail"/>
     </entity>
-    <entity name="LocalNamedEmail" representedClassName="LocalNamedEmail" syncable="YES" codeGenerationType="class">
+    <entity name="CDLocalNamedEmail" representedClassName="CDLocalNamedEmail" syncable="YES" codeGenerationType="class">
         <attribute name="name" attributeType="String"/>
-        <relationship name="address" maxCount="1" deletionRule="Nullify" destinationEntity="LocalEmailIdentity" inverseName="names" inverseEntity="LocalEmailIdentity"/>
-        <relationship name="knownBy" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="RemoteEmailIdentity" inverseName="knowsIdentities" inverseEntity="RemoteEmailIdentity"/>
+        <relationship name="address" maxCount="1" deletionRule="Nullify" destinationEntity="CDLocalEmailIdentity" inverseName="names" inverseEntity="CDLocalEmailIdentity"/>
+        <relationship name="knownBy" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDRemoteEmailIdentity" inverseName="knowsIdentities" inverseEntity="CDRemoteEmailIdentity"/>
     </entity>
-    <entity name="RemoteEmailIdentity" representedClassName="RemoteEmailIdentity" syncable="YES" codeGenerationType="class">
+    <entity name="CDRemoteEmailIdentity" representedClassName="CDRemoteEmailIdentity" syncable="YES" codeGenerationType="class">
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="alternateNames" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AlternateRemoteNames" inverseName="address" inverseEntity="AlternateRemoteNames"/>
-        <relationship name="knowsIdentities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LocalNamedEmail" inverseName="knownBy" inverseEntity="LocalNamedEmail"/>
+        <relationship name="alternateNames" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDAlternateRemoteNames" inverseName="address" inverseEntity="CDAlternateRemoteNames"/>
+        <relationship name="knowsIdentities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDLocalNamedEmail" inverseName="knownBy" inverseEntity="CDLocalNamedEmail"/>
     </entity>
 </model>

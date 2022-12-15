@@ -35,6 +35,7 @@
 		F2952AE9294577BF00C79CFA /* RelationshipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2952AE8294577BF00C79CFA /* RelationshipModel.swift */; };
 		F2952AED294581DC00C79CFA /* LocalEmailIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2952AEC294581DC00C79CFA /* LocalEmailIdentity.swift */; };
 		F2952AEF29486EEB00C79CFA /* CoreDataAbstracted.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2952AEE29486EEB00C79CFA /* CoreDataAbstracted.swift */; };
+		F2A83E58294A86130048E18E /* LocalNamedEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A83E57294A86130048E18E /* LocalNamedEmail.swift */; };
 		F2E0EFFD293EBE3200C60F04 /* EmailAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E0EFFC293EBE3200C60F04 /* EmailAddress.swift */; };
 		F2E0F003293FBF2200C60F04 /* DebugStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E0F002293FBF2200C60F04 /* DebugStateModel.swift */; };
 /* End PBXBuildFile section */
@@ -89,6 +90,7 @@
 		F2952AE8294577BF00C79CFA /* RelationshipModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipModel.swift; sourceTree = "<group>"; };
 		F2952AEC294581DC00C79CFA /* LocalEmailIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEmailIdentity.swift; sourceTree = "<group>"; };
 		F2952AEE29486EEB00C79CFA /* CoreDataAbstracted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataAbstracted.swift; sourceTree = "<group>"; };
+		F2A83E57294A86130048E18E /* LocalNamedEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNamedEmail.swift; sourceTree = "<group>"; };
 		F2E0EFFC293EBE3200C60F04 /* EmailAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAddress.swift; sourceTree = "<group>"; };
 		F2E0F002293FBF2200C60F04 /* DebugStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStateModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -197,6 +199,7 @@
 		15C344C92925D33900A542D3 /* CoreDataAbstractions */ = {
 			isa = PBXGroup;
 			children = (
+				F2952AEE29486EEB00C79CFA /* CoreDataAbstracted.swift */,
 				F2952AEB2945819900C79CFA /* Cache */,
 				F2952AEA2945819200C79CFA /* Relationship */,
 			);
@@ -228,6 +231,7 @@
 			isa = PBXGroup;
 			children = (
 				F2952AEC294581DC00C79CFA /* LocalEmailIdentity.swift */,
+				F2A83E57294A86130048E18E /* LocalNamedEmail.swift */,
 			);
 			path = Relationship;
 			sourceTree = "<group>";
@@ -235,7 +239,6 @@
 		F2952AEB2945819900C79CFA /* Cache */ = {
 			isa = PBXGroup;
 			children = (
-				F2952AEE29486EEB00C79CFA /* CoreDataAbstracted.swift */,
 				15C344CA2925D35300A542D3 /* Credential.swift */,
 				15C344D0292626AE00A542D3 /* Mailbox.swift */,
 				F2952AE12943D60E00C79CFA /* Identity.swift */,
@@ -396,6 +399,7 @@
 				152751D6290A068A00482BA0 /* uprototypeApp.swift in Sources */,
 				15C344D3292BF64C00A542D3 /* MailMessageModel.swift in Sources */,
 				15C344D6292C1E2C00A542D3 /* Account.swift in Sources */,
+				F2A83E58294A86130048E18E /* LocalNamedEmail.swift in Sources */,
 				1594D7A1290DAFFB00FD641B /* JMAPSession.swift in Sources */,
 				15C00BCB29380A52007BAC3A /* JMAP8621Objects.swift in Sources */,
 				152751DD290A068A00482BA0 /* ConversationView.swift in Sources */,

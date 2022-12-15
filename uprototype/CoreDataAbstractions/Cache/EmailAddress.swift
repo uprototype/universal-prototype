@@ -23,7 +23,7 @@ extension EmailAddress {
         if results.count == 1 {
             return results[0]
         }else if results.count > 1 {
-            throw MailModelError.duplicateUniqueObject
+            throw PersistenceError.duplicateUniqueObject
         }
         
         let result = EmailAddress(context: context)

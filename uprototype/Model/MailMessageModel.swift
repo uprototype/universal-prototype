@@ -7,8 +7,9 @@
 
 
 import Foundation
+import Combine
 //deprecate
-import CoreData
+//import CoreData
 
 /*
  Model for fetching mail state (messages, structure) from a JMAP[+ other protocols] server, backed by core data layer that caches the server's state.
@@ -30,26 +31,26 @@ import CoreData
  */
 
 enum MailModelError : Error {
-    case requiredFieldMissing
     case passwordMissing
-    case managedObjectWithoutContext
     case duplicateCredential
     case expectedObjectMissing
-    case duplicateUUID // with mismatched sessionURL
-    case duplicateUniqueObject
     case sessionInvalid
-    case abstractObjectWithoutStoredCopy
 }
 
-actor MailMessageModel : ObservableObject {
+actor MailMessageModel {
     static let shared = MailMessageModel()
     
-    //TODO: Move into a model view and off main actor
     private(set) var sessions = [UUID:SessionizedCredential]()
     private weak var debugState : DebugStateModel? = nil
     
+    //Combine - publish values for identities and relationships for the Relationship Model to consume
+    var identitySubject = PassthroughSubject<EmailIdentityValue, Never>()
+    var relationshipSubject = PassthroughSubject<EmailRelationshipValue, Never>()
 
     init() {
+        Task{
+            await RelationshipModel.shared.connect(to: self)
+        }
         // TODO: -
 //        Commenting out fetch on boot and making it manual during development of bootstrap code
         //

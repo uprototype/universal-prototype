@@ -49,7 +49,7 @@ extension Account {
     convenience init(stored: CDAccount) throws {
         guard let uid = stored.uid,
               let name = stored.name else {
-            throw MailModelError.requiredFieldMissing
+            throw PersistenceError.requiredAttributeMissing
         }
         self.init(uid: uid,
                   name: name,
@@ -62,7 +62,7 @@ extension Account {
     func save(in context: NSManagedObjectContext) throws {
         guard let credentialObjId = credential?.managedObjectId,
               let storedCredential = try context.existingObject(with: credentialObjId) as? CDCredential else {
-            throw MailModelError.expectedObjectMissing
+            throw PersistenceError.expectedObjectMissing
         }
         let storedAccount = CDAccount(context: context)
         storedAccount.name = name
@@ -76,7 +76,7 @@ extension Account {
     func updateCD(in context: NSManagedObjectContext) throws {
         guard let objId = managedObjectId,
               let managedAccount = try context.existingObject(with: objId) as? CDAccount else {
-            throw MailModelError.expectedObjectMissing
+            throw PersistenceError.expectedObjectMissing
         }
         managedAccount.uid = uid
         managedAccount.name = name
@@ -100,7 +100,7 @@ extension Account {
     func managedObject(context: NSManagedObjectContext) throws -> CDAccount? {
         guard let managedObjectId,
               let accountObj = try context.existingObject(with: managedObjectId) as? CDAccount else {
-            throw MailModelError.expectedObjectMissing
+            throw PersistenceError.expectedObjectMissing
         }
         return accountObj
         
@@ -129,19 +129,19 @@ extension CDAccount {
     }
 
     //deprecate
-    static func fetch(uid: String, context: NSManagedObjectContext = PersistenceController.shared.newCacheTaskContext()) -> CDAccount? {
-        let request = CDAccount.fetchRequest(NSPredicate(format: "uid == %@", uid) )
-        do {
-            let results = try context.fetch(request)
-            if results.count == 1 {
-                return results[0]
-            }else{
-                return nil
-            }
-        } catch {
-            return nil
-        }
-    }
+//    static func fetch(uid: String, context: NSManagedObjectContext = PersistenceController.shared.newCacheTaskContext()) -> CDAccount? {
+//        let request = CDAccount.fetchRequest(NSPredicate(format: "uid == %@", uid) )
+//        do {
+//            let results = try context.fetch(request)
+//            if results.count == 1 {
+//                return results[0]
+//            }else{
+//                return nil
+//            }
+//        } catch {
+//            return nil
+//        }
+//    }
 }
 
 //Combine

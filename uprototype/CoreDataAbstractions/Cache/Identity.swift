@@ -18,7 +18,7 @@ class EmailIdentity {
     required init(stored: CDIdentity) throws {
         guard let storedId = stored.serverSetId,
               let storedEmail = stored.email else{
-            throw MailModelError.requiredFieldMissing
+            throw PersistenceError.requiredAttributeMissing
         }
         id = storedId
         email = storedEmail
@@ -33,20 +33,31 @@ class EmailIdentity {
     }
 }
 
-extension EmailIdentity : CoreDataAbstraction {
-    typealias RemoteType = JMAPIdentity
+//for passing to relationshipModel
+struct EmailIdentityValue {
+    let email: String
+    var name: String? //flatten "" to nil
+}
+
+struct EmailRelationshipValue {
+    //sender name and identity
+    //recipients
+}
+
+extension EmailIdentity : AccountAbstractedObject {
+    typealias InputType = JMAPIdentity
     typealias NSManagedType = CDIdentity
     
     static func findMananged(like remote: JMAPIdentity, in account: Account, context: NSManagedObjectContext) throws -> CDIdentity? {
         guard let accountObj = try account.managedObject(context: context) else {
-            throw MailModelError.expectedObjectMissing
+            throw PersistenceError.expectedObjectMissing
         }
         let predicate = NSPredicate(format: "serverSetId == %@ AND account == %@", remote.id, accountObj)
         
         let request = CDIdentity.fetchRequest(predicate)
         let results = try context.fetch(request)
         if results.count > 1 {
-            throw MailModelError.duplicateUniqueObject
+            throw PersistenceError.duplicateUniqueObject
         }
         return results.first
     }
@@ -56,6 +67,7 @@ extension EmailIdentity : CoreDataAbstraction {
             throw JMAPRemoteError.unexpectedError("immutable Identity email changed \(remote.email)")
         }
         name = remote.name
+        sendIdentityValue()
     }
     
     func save() throws {
@@ -64,7 +76,7 @@ extension EmailIdentity : CoreDataAbstraction {
             let storedIdentity: CDIdentity
             if let managedObjectId {
                 guard let identity = try context.existingObject(with: managedObjectId) as? CDIdentity else{
-                    throw MailModelError.expectedObjectMissing
+                    throw PersistenceError.expectedObjectMissing
                 }
                 storedIdentity = identity
             }else{
@@ -80,6 +92,15 @@ extension EmailIdentity : CoreDataAbstraction {
             if managedObjectId == nil {
                 managedObjectId = storedIdentity.objectID
             }
+            sendIdentityValue()
+        }
+        
+    }
+    
+    private func sendIdentityValue() {
+        Task{
+            let identityValue = EmailIdentityValue(email: email, name: name)
+            await MailMessageModel.shared.identitySubject.send(identityValue)
         }
     }
 }
@@ -103,7 +124,7 @@ extension CDIdentity {
                 let fetchRequest = CDIdentity.fetchRequest(predicate)
                 let results = try context.fetch(fetchRequest)
                 if results.count != 1 {
-                    throw MailModelError.expectedObjectMissing
+                    throw PersistenceError.expectedObjectMissing
                 }
                 context.delete(results[0])
             }

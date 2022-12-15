@@ -68,13 +68,18 @@ struct SettingsView: View {
 struct RelationshipSettingsView : View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \LocalEmailIdentity.address, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \CDLocalEmailIdentity.address, ascending: true)],
         animation: .default)
-    private var identities: FetchedResults<LocalEmailIdentity>
+    private var identities: FetchedResults<CDLocalEmailIdentity>
     
     var body: some View {
-        ForEach(identities) { identity in
-            Text(identity.address ?? "")
+        List{
+            ForEach(identities) { identity in
+                VStack(alignment: .leading) {
+                    Text(identity.name ?? "")
+                    Text(identity.address ?? "")
+                }
+            }
         }
     }
 }

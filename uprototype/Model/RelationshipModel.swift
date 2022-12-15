@@ -5,8 +5,8 @@
 //  Created by Universal on 12/10/22.
 //
 
-import Foundation
 import CoreData
+import Combine
 
 /*
  Model for persistent data (unlike MailMessageModel, a cache of data elsewhere)
@@ -15,18 +15,14 @@ import CoreData
 actor RelationshipModel : ObservableObject {
     static let shared = RelationshipModel()
     
-    func newLocalIdentity(email:String, name: String) throws {
-//        let dataContext = PersistenceController.shared.newDataTaskContext()
-//        let localEmailIdentity = try LocalEmailIdentity.fetchOrCreate(address: email, context: dataContext)
-//        
-//        
-//        let names = Set( localEmailIdentity.names?.compactMap{ return $0.name } )
-//        if !names.contains( name ){
-//            var namedEmail = LocalNamedEmail(context: dataContext)
-//            namedEmail.name = name
-//            namedEmail.address = localEmailIdentity
-//        }
-//        try dataContext.save()
+    private var identitySink : AnyCancellable? = nil
+
+    func connect(to mailModel: MailMessageModel){
+        Task{
+            identitySink = await MailMessageModel.shared.identitySubject.sink {value in
+                LocalEmailIdentity.received(value)
+            }
+        }
     }
     
     func newRelationship(localEmail:String, localName:String, remoteEmail:String, remoteName:String, messageId: String) {

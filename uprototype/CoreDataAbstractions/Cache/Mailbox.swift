@@ -17,7 +17,7 @@ class Mailbox {
     required init(stored: CDMailbox) throws {
         guard let storedId = stored.id_,
               let storedName = stored.name else{
-            throw MailModelError.expectedObjectMissing
+            throw PersistenceError.expectedObjectMissing
         }
         id = storedId
         name = storedName
@@ -46,20 +46,20 @@ class Mailbox {
 
 
 
-extension Mailbox : CoreDataAbstraction {
+extension Mailbox : AccountAbstractedObject {
     typealias RemoteType = JMAPMailbox
     typealias NSManagedType = CDMailbox
     
     static func findMananged(like remote: JMAPMailbox, in account: Account, context: NSManagedObjectContext) throws -> CDMailbox? {
         guard let accountObj = try account.managedObject(context: context) else {
-            throw MailModelError.expectedObjectMissing
+            throw PersistenceError.expectedObjectMissing
         }
             let predicate = NSPredicate(format: "id_ == %@ AND account == %@", remote.id, accountObj)
         
         let request = CDMailbox.fetchRequest(predicate)
         let results = try context.fetch(request)
         if results.count > 1 {
-            throw MailModelError.duplicateUniqueObject
+            throw PersistenceError.duplicateUniqueObject
         }
         return results.first
     }
@@ -77,7 +77,7 @@ extension Mailbox : CoreDataAbstraction {
             let storedMailbox : CDMailbox
             if let managedObjectId {
                 guard let mailbox = try context.existingObject(with: managedObjectId) as? CDMailbox else {
-                    throw MailModelError.expectedObjectMissing
+                    throw PersistenceError.expectedObjectMissing
                     
                 }
                 storedMailbox = mailbox
@@ -116,7 +116,7 @@ extension CDMailbox {
                 let fetchRequest = CDMailbox.fetchRequest(predicate)
                 let results = try context.fetch(fetchRequest)
                 if results.count != 1 {
-                    throw MailModelError.expectedObjectMissing
+                    throw PersistenceError.expectedObjectMissing
                 }
                 context.delete(results[0])
             }

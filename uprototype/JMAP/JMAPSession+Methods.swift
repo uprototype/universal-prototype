@@ -19,7 +19,7 @@ extension IndexedSession {
 //        let context = PersistenceController.shared.newCacheTaskContext()
 //        for accountUid in session.raw.accounts.keys {
 //            guard let account = CDAccount.fetch(uid: accountUid, context: context) else {
-//                throw MailModelError.expectedObjectMissing
+//                throw PersistenceError.expectedObjectMissing
 //            }
 //            try await self.syncIdentities(account: account)
 //        }
@@ -29,7 +29,7 @@ extension IndexedSession {
 //    func fetchSendThreads() async throws {
 //        for identity in try CDIdentity.allIdentities() {
 //            guard let email = identity.email else {
-//                throw MailModelError.requiredFieldMissing
+//                throw PersistenceError.requiredAttributeMissing
 //            }
 //            if identity.initialized {
 //                updateEmails(from: email)
@@ -44,7 +44,7 @@ extension IndexedSession {
 //
 //    private func syncIdentities(account: CDAccount) async throws {
 //        guard let accountId = account.uid else {
-//            throw MailModelError.requiredFieldMissing
+//            throw PersistenceError.requiredAttributeMissing
 //        }
 //
 //        if let localIdentityState = account.identityState {
@@ -76,7 +76,7 @@ extension IndexedSession {
 //    //returns Identity object state on server
 //    private func fetchIdentities(account: CDAccount, ids:[JMAPid]? = nil) async throws -> String? {
 //        guard let accountId = account.uid else {
-//            throw MailModelError.requiredFieldMissing
+//            throw PersistenceError.requiredAttributeMissing
 //        }
 //
 //        let requestData = try JMAPIdentity.GetCall(accountId: accountId).requestData()
@@ -103,7 +103,7 @@ extension IndexedSession {
 //            let fetchRequest = CDIdentity.fetchRequest(predicate)
 //            let results = try context.fetch(fetchRequest)
 //            if results.count != 1 {
-//                throw MailModelError.expectedObjectMissing
+//                throw PersistenceError.expectedObjectMissing
 //            }
 //            account.managedObjectContext?.delete(results[0])
 //        }
