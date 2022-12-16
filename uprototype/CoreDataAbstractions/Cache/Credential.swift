@@ -89,28 +89,30 @@ extension SessionizedCredential {
     //MARK: Identities
     func fetchIdentities() async throws {
         for account in credential.accounts {
-            if let identityState = account.identityState{
-                try await identityChanges(for: account, state: identityState)
-            }else{
-                try await identityGet(for: account)
-            }
+            try await identityGet(for: account)
+//            if let identityState = account.identityState{
+//                try await identityChanges(for: account, state: identityState)
+//            }else{
+//                try await identityGet(for: account)
+//            }
         }
     }
     
+    //not currently supported on server
     private func identityChanges(for account: Account, state: String) async throws {
         let requestData = try JMAPIdentity.ChangesCall(accountId: account.uid, sinceState: state).requestData()
         let responseData = try await session.call(data: requestData)
         let changesResponse = try JMAPMailbox.ChangesResponse(responseData: responseData, accountId: account.uid, sessionState: session.raw.state)
-        
+
         try CDIdentity.remove(ids: changesResponse.destroyed, from:account)
-        
+
         let fetchList = Array( Set ( changesResponse.created).union(changesResponse.updated) )
         if !fetchList.isEmpty {
             try await identityGet(for: account, ids: fetchList)
         }
-        
+
         account.identityState = changesResponse.newState
-        
+
         if changesResponse.hasMoreChanges {
             try await identityChanges(for: account, state: changesResponse.newState)
         }

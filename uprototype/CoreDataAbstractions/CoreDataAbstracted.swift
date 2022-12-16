@@ -77,7 +77,12 @@ extension AccountAbstractedObject {
             typedSubject.sink = typedSubject.subject.sink { completion in
                 switch completion {
                 case .finished:
-                    account.mailboxState = typedSubject.state
+                    switch typeEnum {
+                    case .Identity:
+                        account.identityState = typedSubject.state
+                    case .Mailbox:
+                        account.mailboxState = typedSubject.state
+                    }
                     try? account.updateCD(updateState: true)
                 case .failure(let error):
                     print(error)

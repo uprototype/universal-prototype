@@ -89,8 +89,16 @@ extension LocalEmailIdentity {
     
     static func received(_ input: EmailIdentityValue) {
         do{
-//            print("received\(input))")
-            let _ = try LocalEmailIdentity(remote: input)
+            let context = PersistenceController.shared.newDataTaskContext()
+            try context.performAndWait {
+                if let storedIdentity = try CDLocalEmailIdentity.fetch(address: input.email, context: context) {
+                    let identityObj = try LocalEmailIdentity(stored: storedIdentity)
+                    try identityObj.merge(input)
+                    try identityObj.save()
+                }else{
+                    let _ = try LocalEmailIdentity(remote: input)
+                }
+            }
         }catch{
             print("error receiving identity in relationship singleton")
         }
@@ -109,7 +117,7 @@ extension CDLocalEmailIdentity {
         return request
     }
     
-    static func fetchOrCreate(address: String, context: NSManagedObjectContext ) throws -> CDLocalEmailIdentity {
+    static func fetch(address: String, context: NSManagedObjectContext ) throws -> CDLocalEmailIdentity? {
         let predicate = NSPredicate(format: "address == %@", address)
         let request = CDLocalEmailIdentity.fetchRequest(predicate)
         
@@ -119,9 +127,6 @@ extension CDLocalEmailIdentity {
         }else if results.count > 1 {
             throw PersistenceError.duplicateUniqueObject
         }
-        
-        let result = CDLocalEmailIdentity(context: context)
-        result.address = address
-        return result
+        return nil
     }
 }

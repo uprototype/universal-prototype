@@ -92,6 +92,7 @@ extension Account {
         let context = PersistenceController.shared.newCacheTaskContext()
         try context.performAndWait {
             try updateCD(in: context, updateState: updateState)
+            print("updating/saving account with mailboxstate \(mailboxState), flag \(updateState)")
             try context.save()
         }
     }
