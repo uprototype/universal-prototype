@@ -78,7 +78,7 @@ extension AccountAbstractedObject {
                 switch completion {
                 case .finished:
                     account.mailboxState = typedSubject.state
-                    try? account.updateCD()
+                    try? account.updateCD(updateState: true)
                 case .failure(let error):
                     print(error)
 
@@ -87,7 +87,6 @@ extension AccountAbstractedObject {
                 do{
                     let context = PersistenceController.shared.newCacheTaskContext()
                     try context.performAndWait {
-//                        try T.store(value, in: self, context: context)
                         try store(value, in: account, context: context)
                     }
                 }catch{

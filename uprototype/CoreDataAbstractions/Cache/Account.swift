@@ -73,22 +73,25 @@ extension Account {
     }
     
     //expecting to be run within a perform block on the context
-    func updateCD(in context: NSManagedObjectContext) throws {
+    func updateCD(in context: NSManagedObjectContext, updateState:Bool = false) throws {
         guard let objId = managedObjectId,
               let managedAccount = try context.existingObject(with: objId) as? CDAccount else {
             throw PersistenceError.expectedObjectMissing
         }
         managedAccount.uid = uid
         managedAccount.name = name
-        managedAccount.emailState = emailState
-        managedAccount.identityState = identityState
-        managedAccount.mailboxState = mailboxState
+        
+        if updateState{
+            managedAccount.emailState = emailState
+            managedAccount.identityState = identityState
+            managedAccount.mailboxState = mailboxState
+        }
     }
     
-    func updateCD() throws {
+    func updateCD(updateState: Bool = false) throws {
         let context = PersistenceController.shared.newCacheTaskContext()
         try context.performAndWait {
-            try updateCD(in: context)
+            try updateCD(in: context, updateState: updateState)
             try context.save()
         }
     }
