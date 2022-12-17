@@ -10,9 +10,9 @@ import SwiftUI
 
 @main
 struct uprototypeApp: App {
-    //now safe in Swift 5.5
-//    let persistenceController = PersistenceController.shared
-
+    //start relationship processing of incoming events
+    let relationshipModel = RelationshipModel.shared
+    
     var body: some Scene {
         WindowGroup {
             TabView{

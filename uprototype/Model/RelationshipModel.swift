@@ -16,16 +16,38 @@ actor RelationshipModel : ObservableObject {
     static let shared = RelationshipModel()
     
     private var identitySink : AnyCancellable? = nil
+}
 
-    func connect(to mailModel: MailMessageModel){
+//Gather API and implementation for MailMessageModel
+extension RelationshipModel {
+    func connect(){
         Task{
-            identitySink = await MailMessageModel.shared.identitySubject.sink {value in
+            let mailModel = MailMessageModel.shared
+            
+            identitySink = await mailModel.identitySubject.sink {value in
                 LocalEmailIdentity.received(value)
             }
+            // envision identityupdates -> threadupdates -> email updates
+            updateThreads()
         }
     }
     
+    //not yet used
     func newRelationship(localEmail:String, localName:String, remoteEmail:String, remoteName:String, messageId: String) {
+        
+    }
+    
+    // MARK: - Implementation
+    private func updateThreads() {
+        do {
+            try LocalEmailIdentity.allIdentityAddresses().forEach { address in
+                Task {
+                    await MailMessageModel.shared.retrieveNewThreads(senderAddress: address)
+                }
+            }
+        }catch{
+            print("Error in updating Threads: \(error)")
+        }
         
     }
 }

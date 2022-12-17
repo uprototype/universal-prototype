@@ -86,6 +86,15 @@ extension LocalEmailIdentity : CoreDataAbstraction{
 }
 
 extension LocalEmailIdentity {
+    static func allIdentityAddresses() throws -> [String] {
+        let context = PersistenceController.shared.newDataTaskContext()
+        return try context.performAndWait {
+            let request = CDLocalEmailIdentity.fetchRequest()
+            return try context.fetch(request).compactMap {
+                return $0.address
+            }
+        }
+    }
     
     static func received(_ input: EmailIdentityValue) {
         do{

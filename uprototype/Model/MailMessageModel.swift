@@ -49,7 +49,7 @@ actor MailMessageModel {
 
     init() {
         Task{
-            await RelationshipModel.shared.connect(to: self)
+            await RelationshipModel.shared.connect()
         }
         // TODO: -
 //        Commenting out fetch on boot and making it manual during development of bootstrap code
@@ -188,7 +188,7 @@ actor MailMessageModel {
      Prototype strategy v.2:
      Core Data as cache of emails in working set
      Working Set definition:
-        - Identities: get for identities
+        - Identities: Use relationship model set of identities learned from cache layer
             - TODO, offer user to add identities not present now, but in sent mailbox (e.g. imported)
         - Recipients: to, from or bcc on mail where i \in identities was the sender
         - for prototyping, limit to past year
@@ -273,5 +273,12 @@ actor MailMessageModel {
     
     func resetCache() {
         sessions = [UUID:SessionizedCredential]()
+    }
+}
+
+//gather API and implementation for the RelationshipModel to interact
+extension MailMessageModel {
+    func retrieveNewThreads(senderAddress: String) {
+        
     }
 }
