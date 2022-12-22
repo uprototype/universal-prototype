@@ -11,6 +11,7 @@ class LocalEmailIdentity {
     let email: String
     var defaultName: String? = nil
     var names = Set<LocalNamedEmail> ()
+    var initialized = false
     
     var managedObjectId : NSManagedObjectID? = nil
     
@@ -19,6 +20,7 @@ class LocalEmailIdentity {
             throw PersistenceError.requiredAttributeMissing
         }
         self.email = email
+        initialized = stored.initialized
         defaultName = stored.name
         
         let alternateNames : [LocalNamedEmail]? = stored.names?.compactMap{
@@ -74,6 +76,7 @@ extension LocalEmailIdentity : CoreDataAbstraction{
 
             storedIdentity.name = defaultName
             storedIdentity.address = email
+            storedIdentity.initialized = initialized
             for name in self.names {
                 try name.save(in: storedIdentity, context: context)
             }
@@ -86,12 +89,23 @@ extension LocalEmailIdentity : CoreDataAbstraction{
 }
 
 extension LocalEmailIdentity {
-    static func allIdentityAddresses() throws -> [String] {
+    static func allIdentities() throws -> [LocalEmailIdentity] {
         let context = PersistenceController.shared.newDataTaskContext()
         return try context.performAndWait {
             let request = CDLocalEmailIdentity.fetchRequest()
             return try context.fetch(request).compactMap {
-                return $0.address
+                return try LocalEmailIdentity(stored: $0)
+            }
+        }
+    }
+    
+    static func allUninitializedIdentities() throws -> [LocalEmailIdentity] {
+        let context = PersistenceController.shared.newDataTaskContext()
+        return try context.performAndWait {
+            let predicate = NSPredicate(format: "initialized == YES")
+            let request = CDLocalEmailIdentity.fetchRequest(predicate)
+            return try context.fetch(request).compactMap {
+                return try LocalEmailIdentity(stored: $0)
             }
         }
     }
@@ -106,6 +120,11 @@ extension LocalEmailIdentity {
                     try identityObj.save()
                 }else{
                     let _ = try LocalEmailIdentity(remote: input)
+                    
+                    //if not new, then initialize
+                    Task{
+                        await MailMessageModel.shared.initializeIdentity(address: input.email, isLocal: true)
+                    }
                 }
             }
         }catch{

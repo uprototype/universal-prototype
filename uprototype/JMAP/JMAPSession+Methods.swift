@@ -26,18 +26,6 @@ extension IndexedSession {
 //        try context.save()
 //    }
 //
-//    func fetchSendThreads() async throws {
-//        for identity in try CDIdentity.allIdentities() {
-//            guard let email = identity.email else {
-//                throw PersistenceError.requiredAttributeMissing
-//            }
-//            if identity.initialized {
-//                updateEmails(from: email)
-//            }else{
-//                initializeEmails(from: email)
-//            }
-//        }
-//    }
 
     
     // MARK: - Implementation - Identities

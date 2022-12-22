@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="21G320" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CDAlternateRemoteNames" representedClassName="CDAlternateRemoteNames" syncable="YES" codeGenerationType="class">
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="address" maxCount="1" deletionRule="Nullify" destinationEntity="CDRemoteEmailIdentity" inverseName="alternateNames" inverseEntity="CDRemoteEmailIdentity"/>
     </entity>
     <entity name="CDLocalEmailIdentity" representedClassName="CDLocalEmailIdentity" syncable="YES" codeGenerationType="class">
         <attribute name="address" attributeType="String"/>
+        <attribute name="initialized" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="names" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDLocalNamedEmail" inverseName="address" inverseEntity="CDLocalNamedEmail"/>
     </entity>

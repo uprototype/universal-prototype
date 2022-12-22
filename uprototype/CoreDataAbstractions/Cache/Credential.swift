@@ -128,6 +128,22 @@ extension SessionizedCredential {
             await MailMessageModel.shared.invalidateSession(self)
         }
     }
+    
+    //MARK: - Fetch Emails
+    func fetchEmails() async throws {
+        // finish init
+        let localIds = try LocalEmailIdentity.allUninitializedIdentities()
+        
+        localIds.forEach { localId in
+            Task{
+                await MailMessageModel.shared.initializeIdentity(address: localId.email, isLocal: true)
+            }
+        }
+        //finish init for remote
+        
+        //fetch new
+        //mailmodel actor ensures each task happens in sequence - optimize for asynchronicity within each task
+    }
 }
 
 class Credential {

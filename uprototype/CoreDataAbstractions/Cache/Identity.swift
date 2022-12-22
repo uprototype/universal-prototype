@@ -86,7 +86,6 @@ extension EmailIdentity : AccountAbstractedObject {
             storedIdentity.serverSetId = id
             storedIdentity.email = email
             storedIdentity.name = name
-            storedIdentity.initialized = initialized
             
             try context.save()
             if managedObjectId == nil {

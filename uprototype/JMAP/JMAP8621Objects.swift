@@ -14,7 +14,7 @@ struct JMAPMailbox : JMAPObject {
     let id: String
     let name: String
     let parentId: String?
-    let role: Role?
+    let role: String?
     let sortOrder: UInt
     let totalEmails: UInt
     let unreadEmails: UInt
@@ -23,19 +23,22 @@ struct JMAPMailbox : JMAPObject {
     let isSubscribed : Bool
     let myRights : Rights
     
-    enum Role : String , Codable {
-        case all
-        case archive
-        case drafts
-        case flagged
-        case important
-        case inbox
-        case junk
-        case scheduled //not defined in https://www.iana.org/assignments/imap-mailbox-name-attributes/imap-mailbox-name-attributes.xhtml
-        case sent
-        case subscribed
-        case trash
-    }
+//    struct Role : Hashable {
+//        public let rawValue: String
+//    }
+//    enum Role : String , Codable {
+//        case all
+//        case archive
+//        case drafts
+//        case flagged
+//        case important
+//        case inbox
+//        case junk
+//        case scheduled //not defined in https://www.iana.org/assignments/imap-mailbox-name-attributes/imap-mailbox-name-attributes.xhtml
+//        case sent
+//        case subscribed
+//        case trash
+//    }
     
     struct Rights : Codable{
         let mayReadItems: Bool

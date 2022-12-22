@@ -10,7 +10,7 @@ import CoreData
 class Mailbox {
     let id: JMAPid
     var name: String
-    var role: JMAPMailbox.Role?
+    var role: String?
     
     var managedObjectId : NSManagedObjectID?
     
@@ -21,12 +21,8 @@ class Mailbox {
         }
         id = storedId
         name = storedName
-        if let roleString = stored.role,
-           let roleEnum = JMAPMailbox.Role(rawValue: roleString) {
-            role = roleEnum
-        }else {
-            role = nil
-        }
+        role = stored.role
+        
         managedObjectId = stored.objectID
     }
     
@@ -36,7 +32,7 @@ class Mailbox {
         role = remote.role
     }
     
-    private init(id: JMAPid, name: String, role: JMAPMailbox.Role? = nil, managedObjectId: NSManagedObjectID? = nil) {
+    private init(id: JMAPid, name: String, role: String? = nil, managedObjectId: NSManagedObjectID? = nil) {
         self.id = id
         self.name = name
         self.role = role
@@ -87,7 +83,7 @@ extension Mailbox : AccountAbstractedObject {
             
             storedMailbox.id_ = id
             storedMailbox.name = name
-            storedMailbox.role = role?.rawValue
+            storedMailbox.role = role
             
             try context.save()
             if managedObjectId == nil{

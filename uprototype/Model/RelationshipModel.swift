@@ -20,6 +20,10 @@ actor RelationshipModel : ObservableObject {
 
 //Gather API and implementation for MailMessageModel
 extension RelationshipModel {
+    
+    //Setup Relationship Model to consume values from the cache
+    // Specifically, identity to update local identity
+    // emails to update relationships
     func connect(){
         Task{
             let mailModel = MailMessageModel.shared
@@ -27,8 +31,6 @@ extension RelationshipModel {
             identitySink = await mailModel.identitySubject.sink {value in
                 LocalEmailIdentity.received(value)
             }
-            // envision identityupdates -> threadupdates -> email updates
-            updateThreads()
         }
     }
     
@@ -38,16 +40,18 @@ extension RelationshipModel {
     }
     
     // MARK: - Implementation
-    private func updateThreads() {
-        do {
-            try LocalEmailIdentity.allIdentityAddresses().forEach { address in
-                Task {
-                    await MailMessageModel.shared.retrieveNewThreads(senderAddress: address)
-                }
-            }
-        }catch{
-            print("Error in updating Threads: \(error)")
-        }
-        
-    }
+    
+
+//    private func updateThreads() {
+//        do {
+//            try LocalEmailIdentity.allIdentityAddresses().forEach { address in
+//                Task {
+//                    await MailMessageModel.shared.retrieveNewThreads(senderAddress: address)
+//                }
+//            }
+//        }catch{
+//            print("Error in updating Threads: \(error)")
+//        }
+//
+//    }
 }

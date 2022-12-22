@@ -166,13 +166,15 @@ actor MailMessageModel {
             
             debugState?.updateFetch(description: "fetching Identities", progress: 0.4)
             try await sessCredential.fetchIdentities()
-            //            try await indexedSession.syncIdentities()
-            //
+
             debugState?.updateFetch(description: "fetching Emails", progress: 0.6)
-            //            try await indexedSession.fetchSendThreads()
-            //Fetch Emails
+            // continue any unfinished init jobs
+            // , then fetch emails since last state
             //            try await fetchEmails(uuid: uuid, session: session)
-            //
+            try await sessCredential.fetchEmails()
+            
+            
+            
             debugState?.updateFetch(description: "fetch complete", progress: 1.0)
         }catch{
             debugState?.updateFetch(description: "Error in fetch sequence", progress: 0.0)
@@ -192,28 +194,26 @@ actor MailMessageModel {
             - TODO, offer user to add identities not present now, but in sent mailbox (e.g. imported)
         - Recipients: to, from or bcc on mail where i \in identities was the sender
         - for prototyping, limit to past year
+     
      Batch fetch using query (of this subset) until initialized
      Then request changes each boot to all email and locally filter
      
      Initialization (optimized for working subset)
         - Fetch Session -> Accounts -> Mailboxes -> Identities
-        - For identity in identities
-            - create query for mail where to is identity
-            - fetch id's and email objects in batches
+        - Relationship model infers sender identities and remote identities from emails
+        - for each sender and remote identity,
+            - create query for email with that identity
+            - download all emails in that thread
         - when complete, mark email state in account object's email state
      
      Changes (optimize for completeness going forward)
-        - ask for changes
-        - download
+        - ask for email changes
+            - save all, filter on identities
+        - ask for thread changes (redundant, but for completeness)
+     
+     Flag threads (not messages) that match criteria
      
      If new identity is discovered, run initialization for that identity.
-     
-     
-     
-     
-     - get mailbox id's for a working set
-     - Email/query for id's of the messages
-     - Email/get those messages
      
      */
 //    private func fetchEmails(uuid: UUID, session:JMAPSession) async throws {
@@ -278,7 +278,15 @@ actor MailMessageModel {
 
 //gather API and implementation for the RelationshipModel to interact
 extension MailMessageModel {
-    func retrieveNewThreads(senderAddress: String) {
+    
+    //called from LocalEmailIdentity.received
+    //  and from fetchEmails to catch unfinished jobs
+    // if a new identity is observed
+    func initializeIdentity(address:String, isLocal: Bool) {
+        // query for emails from / to this identity 
         
     }
+//    func retrieveNewThreads(senderAddress: String) {
+//
+//    }
 }
