@@ -11,7 +11,6 @@ class LocalEmailIdentity {
     let email: String
     var defaultName: String? = nil
     var names = Set<LocalNamedEmail> ()
-    var initialized = false
     
     var managedObjectId : NSManagedObjectID? = nil
     
@@ -20,7 +19,6 @@ class LocalEmailIdentity {
             throw PersistenceError.requiredAttributeMissing
         }
         self.email = email
-        initialized = stored.initialized
         defaultName = stored.name
         
         let alternateNames : [LocalNamedEmail]? = stored.names?.compactMap{
@@ -36,7 +34,7 @@ class LocalEmailIdentity {
         managedObjectId = stored.objectID
     }
     
-    required init(remote: EmailIdentityValue) throws {
+    required init(remote: EmailIdentityValue, accountId: String) throws {
         email = remote.email
         defaultName = remote.name
         if let remoteName = remote.name {
@@ -76,7 +74,8 @@ extension LocalEmailIdentity : CoreDataAbstraction{
 
             storedIdentity.name = defaultName
             storedIdentity.address = email
-            storedIdentity.initialized = initialized
+            
+
             for name in self.names {
                 try name.save(in: storedIdentity, context: context)
             }
@@ -102,7 +101,7 @@ extension LocalEmailIdentity {
     static func allUninitializedIdentities() throws -> [LocalEmailIdentity] {
         let context = PersistenceController.shared.newDataTaskContext()
         return try context.performAndWait {
-            let predicate = NSPredicate(format: "initialized == YES")
+            let predicate = NSPredicate(format: "pendingAccountInit.@count != 0")
             let request = CDLocalEmailIdentity.fetchRequest(predicate)
             return try context.fetch(request).compactMap {
                 return try LocalEmailIdentity(stored: $0)
@@ -110,7 +109,7 @@ extension LocalEmailIdentity {
         }
     }
     
-    static func received(_ input: EmailIdentityValue) {
+    static func received(_ input: EmailIdentityValue, accountId: String) {
         do{
             let context = PersistenceController.shared.newDataTaskContext()
             try context.performAndWait {
@@ -119,12 +118,7 @@ extension LocalEmailIdentity {
                     try identityObj.merge(input)
                     try identityObj.save()
                 }else{
-                    let _ = try LocalEmailIdentity(remote: input)
-                    
-                    //if not new, then initialize
-                    Task{
-                        await MailMessageModel.shared.initializeIdentity(address: input.email, isLocal: true)
-                    }
+                    try LocalEmailIdentity(remote: input, accountId: accountId)
                 }
             }
         }catch{

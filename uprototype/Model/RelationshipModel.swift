@@ -28,8 +28,8 @@ extension RelationshipModel {
         Task{
             let mailModel = MailMessageModel.shared
             
-            identitySink = await mailModel.identitySubject.sink {value in
-                LocalEmailIdentity.received(value)
+            identitySink = await mailModel.identitySubject.sink { (value, accountId) in
+                LocalEmailIdentity.received(value, accountId: accountId)
             }
         }
     }

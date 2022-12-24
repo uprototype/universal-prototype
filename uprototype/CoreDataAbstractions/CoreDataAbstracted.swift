@@ -14,6 +14,7 @@ enum PersistenceError : Error {
     case abstractObjectWithoutStoredCopy
 }
 
+// TODO: - Separate into separate protocols for Abstraction and cache of remote
 //behavior of the center object in the relationship
 //JMAPObject <> Object <> CDObject
 protocol CoreDataAbstraction {
@@ -22,7 +23,7 @@ protocol CoreDataAbstraction {
     var managedObjectId : NSManagedObjectID? { get }
     
     init(stored: NSManagedType) throws
-    init(remote: InputType) throws
+    init(remote: InputType, accountId: String) throws
     
     func merge(_ remote: InputType) throws
     func save() throws
@@ -31,6 +32,8 @@ protocol CoreDataAbstraction {
 }
 
 protocol AccountAbstractedObject : CoreDataAbstraction where NSManagedType : AccountScoped {
+    var accountId: JMAPid { get }
+    
     static func store(_ value:InputType, in account:Account, context: NSManagedObjectContext) throws
     static func findMananged(like remote:InputType, in account:Account, context: NSManagedObjectContext) throws -> NSManagedType?
     static func insert(_ remote:InputType, in account:Account, context: NSManagedObjectContext) throws
@@ -50,7 +53,7 @@ extension AccountAbstractedObject {
     }
     
     static func insert(_ remote: InputType, in account: Account, context: NSManagedObjectContext) throws {
-        let newObject = try Self.init(remote: remote)
+        let newObject = try Self.init(remote: remote, accountId: account.uid)
         try newObject.save()
         let context = PersistenceController.shared.newCacheTaskContext()
         try context.performAndWait {

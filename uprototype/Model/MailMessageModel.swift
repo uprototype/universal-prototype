@@ -42,9 +42,11 @@ actor MailMessageModel {
     
     private(set) var sessions = [UUID:SessionizedCredential]()
     private weak var debugState : DebugStateModel? = nil
+    //Keep track of sender identities per credential to prevent leaking them cross-provider
+    private var senderIdentityMap = [String:[UUID]]()
     
     //Combine - publish values for identities and relationships for the Relationship Model to consume
-    var identitySubject = PassthroughSubject<EmailIdentityValue, Never>()
+    var identitySubject = PassthroughSubject<(EmailIdentityValue, String), Never>()
     var relationshipSubject = PassthroughSubject<EmailRelationshipValue, Never>()
 
     init() {
@@ -167,13 +169,17 @@ actor MailMessageModel {
             debugState?.updateFetch(description: "fetching Identities", progress: 0.4)
             try await sessCredential.fetchIdentities()
 
-            debugState?.updateFetch(description: "fetching Emails", progress: 0.6)
-            // continue any unfinished init jobs
+            debugState?.updateFetch(description: "selectively fetching Emails", progress: 0.6)
+            // start/continue any unfinished init jobs
+            try await sessCredential.initializeEmails()
+            
+//            debugState?.updateFetch(description: "fetching new mail since the last", progress: 0.8)
+//            // start/continue any unfinished init jobs
+//            try await sessCredential.fetchNewEmails
+            
             // , then fetch emails since last state
             //            try await fetchEmails(uuid: uuid, session: session)
-            try await sessCredential.fetchEmails()
-            
-            
+
             
             debugState?.updateFetch(description: "fetch complete", progress: 1.0)
         }catch{
@@ -184,8 +190,7 @@ actor MailMessageModel {
     }
     
     // MARK: - Implementation - Emails
-    
-    
+
     /*
      Prototype strategy v.2:
      Core Data as cache of emails in working set
@@ -205,6 +210,8 @@ actor MailMessageModel {
             - create query for email with that identity
             - download all emails in that thread
         - when complete, mark email state in account object's email state
+     Since initialization is a server-side query, to avoid leaking identities across credentials, limit server-side query to identities learned from that provider
+     (future: optional fetch of more emails for completeness)
      
      Changes (optimize for completeness going forward)
         - ask for email changes
@@ -278,13 +285,8 @@ actor MailMessageModel {
 
 //gather API and implementation for the RelationshipModel to interact
 extension MailMessageModel {
-    
-    //called from LocalEmailIdentity.received
-    //  and from fetchEmails to catch unfinished jobs
-    // if a new identity is observed
-    func initializeIdentity(address:String, isLocal: Bool) {
-        // query for emails from / to this identity 
-        
+    // runs through each account:credential, looks for unitilianized identtiies, and completes the query
+    func initializeIdentities () {
     }
 //    func retrieveNewThreads(senderAddress: String) {
 //

@@ -117,13 +117,13 @@ struct MailboxMessageListView : View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Email.receivedAt, ascending: true)],
         animation: .default)
-    private var items: FetchedResults<Email>
+    private var items: FetchedResults<CDEmail>
     var mailbox: CDMailbox
     
     init(_ mailbox: CDMailbox) {
         let predicate = NSPredicate(format: "mailboxes CONTAINS %@", mailbox)
-        let request = Email.fetchRequest(predicate)
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \Email.receivedAt, ascending: true)]
+        let request = CDEmail.fetchRequest(predicate)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \CDEmail.receivedAt, ascending: true)]
         _items = FetchRequest(fetchRequest: request)
         self.mailbox = mailbox
     }

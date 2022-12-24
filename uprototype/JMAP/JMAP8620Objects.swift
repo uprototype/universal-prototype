@@ -351,22 +351,29 @@ class JMAPQueryCall : Codable {
         
     }
     
-    enum Filter : Codable{
-//        case filterOperator(JMAPOperator, [Filter])
+    indirect enum Filter : Codable{
+        case filterOperator(FilterOperator)
         case filterCondition([String:String])
         
         func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
             switch self{
             case .filterCondition(let filterMap):
-                var container = encoder.singleValueContainer()
                 try container.encode(filterMap)
+            case .filterOperator(let filterOperator):
+                try container.encode(filterOperator)
             }
         }
     }
     
     struct FilterOperator : Codable{
         let operator_ : JMAPOperator
-        let conditions : JMAPCondition
+        let conditions : Filter
+        
+        enum CodingKeys : String, CodingKey {
+            case operator_ = "operator"
+            case conditions = "conditions"
+        }
     }
     
     enum JMAPOperator : String, Codable {

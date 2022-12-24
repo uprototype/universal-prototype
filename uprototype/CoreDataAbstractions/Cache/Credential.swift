@@ -90,6 +90,8 @@ extension SessionizedCredential {
     func fetchIdentities() async throws {
         for account in credential.accounts {
             try await identityGet(for: account)
+            
+            //commented out as not currently supported by server
 //            if let identityState = account.identityState{
 //                try await identityChanges(for: account, state: identityState)
 //            }else{
@@ -130,19 +132,68 @@ extension SessionizedCredential {
     }
     
     //MARK: - Fetch Emails
-    func fetchEmails() async throws {
-        // finish init
-        let localIds = try LocalEmailIdentity.allUninitializedIdentities()
-        
-        localIds.forEach { localId in
-            Task{
-                await MailMessageModel.shared.initializeIdentity(address: localId.email, isLocal: true)
+    //Initialize local and (allow-listed) remote email addresses
+    // may be re-run to check for unfinished init jobs
+    // so intermediate state should consult core data, not in-memory state
+    func initializeEmails() async throws {
+        for account in credential.accounts {
+            for identity in try await account.uninitializedIdentities() {
+                try await initializeEmails(for: identity, in: account)
             }
         }
-        //finish init for remote
+    }
+    
+    private func initializeEmails(for identity: EmailIdentity, in account: Account ) async throws {
+        //query emailsIds from that identity
+        let sendEmailIds = try await queryEmails(for: identity, in: account)
         
-        //fetch new
-        //mailmodel actor ensures each task happens in sequence - optimize for asynchronicity within each task
+        //let threadIds = await threadID(for email)
+        
+        //threadID get
+        
+        //fetch the emails in batches
+        
+        
+        
+        
+        // fetch threads for those emails
+        // filter on emails not yet fetched
+        
+        //fetch all those emails
+        
+        //collect sender identities
+        
+        //fetch mail from the sender identities
+        //catching unanswered mail, possibly cross-identity
+        
+        //when complete, mark EmailIdentity as initialized
+//        identity.initialized = true
+//        identity.save()
+    }
+    
+    private func queryEmails(for identity: EmailIdentity, in account: Account) async throws  -> [JMAPid] {
+        let filter = JMAPQueryCall.Filter.filterCondition(["from" : identity.email])
+        let comparator = JMAPQueryCall.Comparator(property: "receivedAt", isAscending: false)
+        let queryCall = JMAPEmail.QueryCall(accountId: account.uid,
+                                            filter: filter,
+                                            sort: [comparator],
+                                            position: 0,
+                                            calculateTotal: true)
+        let requestData = try queryCall.requestData()
+        
+        let responseData = try await session.call(data: requestData)
+        
+        let responseObject = try JMAPEmail.QueryResponse(responseData: responseData, accountId: account.uid, sessionState: session.raw.state)
+        
+        print("email query response for id \(identity.email): \(responseObject.ids.count)")
+        
+        return responseObject.ids
+        
+//        let responseObject = try JMAPResponse<JMAPEmail.QueryResponse>.fromQuery(data: responseData)
+        
+        
+        // CONTINUATION
+//        let request
     }
 }
 

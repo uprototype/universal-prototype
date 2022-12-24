@@ -11,25 +11,30 @@ class EmailIdentity {
     let id: JMAPid //= serverSetId in Core Data
     let email: String //immutable
     var name: String
+    private (set) var accountId : JMAPid
     var initialized = false //has the bootstrap job been run on this identity yet. if nil, then false
     
     var managedObjectId : NSManagedObjectID? = nil
     
     required init(stored: CDIdentity) throws {
         guard let storedId = stored.serverSetId,
-              let storedEmail = stored.email else{
+              let storedEmail = stored.email,
+              let accountId = stored.account?.uid else{
             throw PersistenceError.requiredAttributeMissing
         }
         id = storedId
         email = storedEmail
         name = stored.name ?? ""
+        initialized = stored.initialized
+        self.accountId = accountId
         managedObjectId = stored.objectID
     }
     
-    required init(remote: JMAPIdentity) {
+    required init(remote: JMAPIdentity, accountId: String ) {
         id = remote.id
         email = remote.email
         name = remote.name
+        self.accountId = accountId
     }
 }
 
@@ -99,7 +104,7 @@ extension EmailIdentity : AccountAbstractedObject {
     private func sendIdentityValue() {
         Task{
             let identityValue = EmailIdentityValue(email: email, name: name)
-            await MailMessageModel.shared.identitySubject.send(identityValue)
+            await MailMessageModel.shared.identitySubject.send((identityValue, accountId))
         }
     }
 }

@@ -92,7 +92,7 @@ extension Account {
         let context = PersistenceController.shared.newCacheTaskContext()
         try context.performAndWait {
             try updateCD(in: context, updateState: updateState)
-            print("updating/saving account with mailboxstate \(mailboxState), flag \(updateState)")
+//            print("updating/saving account with mailboxstate \(mailboxState), flag \(updateState)")
             try context.save()
         }
     }
@@ -108,6 +108,19 @@ extension Account {
         }
         return accountObj
         
+    }
+    
+    func uninitializedIdentities() async throws -> [EmailIdentity] {
+        let context = PersistenceController.shared.newCacheTaskContext()
+        guard let accountObj = try managedObject(context: context) else {
+            throw PersistenceError.expectedObjectMissing
+        }
+        let predicate = NSPredicate(format:"initialized == %@ AND account == %@", false , accountObj)
+        let request = CDIdentity.fetchRequest(predicate)
+        return try await context.perform {
+            let results = try context.fetch(request)
+            return try results.map{ try EmailIdentity(stored: $0) }
+        }
     }
 }
 

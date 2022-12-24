@@ -6,7 +6,6 @@
     </entity>
     <entity name="CDLocalEmailIdentity" representedClassName="CDLocalEmailIdentity" syncable="YES" codeGenerationType="class">
         <attribute name="address" attributeType="String"/>
-        <attribute name="initialized" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="names" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDLocalNamedEmail" inverseName="address" inverseEntity="CDLocalNamedEmail"/>
     </entity>

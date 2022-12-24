@@ -12,32 +12,36 @@ class Mailbox {
     var name: String
     var role: String?
     
+    var accountId: JMAPid
     var managedObjectId : NSManagedObjectID?
     
     required init(stored: CDMailbox) throws {
         guard let storedId = stored.id_,
-              let storedName = stored.name else{
+              let storedName = stored.name,
+              let accountId = stored.account?.uid else{
             throw PersistenceError.expectedObjectMissing
         }
         id = storedId
         name = storedName
         role = stored.role
+        self.accountId = accountId
         
         managedObjectId = stored.objectID
     }
     
-    required init(remote: JMAPMailbox) {
+    required init(remote: JMAPMailbox, accountId: JMAPid) {
         id = remote.id
         name = remote.name
         role = remote.role
+        self.accountId = accountId
     }
     
-    private init(id: JMAPid, name: String, role: String? = nil, managedObjectId: NSManagedObjectID? = nil) {
-        self.id = id
-        self.name = name
-        self.role = role
-        self.managedObjectId = managedObjectId
-    }
+//    private init(id: JMAPid, name: String, role: String? = nil, managedObjectId: NSManagedObjectID? = nil) {
+//        self.id = id
+//        self.name = name
+//        self.role = role
+//        self.managedObjectId = managedObjectId
+//    }
 }
 
 
